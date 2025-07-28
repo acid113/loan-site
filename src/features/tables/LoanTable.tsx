@@ -1,144 +1,23 @@
-// "use client"
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit, Trash2, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-react';
+
 import LoanAdd from '@/features/modals/LoanAdd';
 import LoanEdit from '@/features/modals/LoanEdit';
-import ConfirmationDelete from '../modals/ConfirmationDelete';
-
-type StatusType = 'Approved' | 'Pending' | 'Rejected';
-type SortField = 'name' | 'amount' | null;
-type SortDirection = 'asc' | 'desc';
-
-interface IAffiliateData {
-  id: string;
-  name: string;
-  amount: number;
-  status: StatusType;
-}
-
-const mockData: IAffiliateData[] = [
-  {
-    id: '#32',
-    name: 'Darlene Robertson',
-    amount: 2450,
-    status: 'Approved',
-  },
-  {
-    id: '#42',
-    name: 'Ronald Richards',
-    amount: 7890,
-    status: 'Approved',
-  },
-  {
-    id: '#21',
-    name: 'Devon Lane',
-    amount: 3200,
-    status: 'Pending',
-  },
-  {
-    id: '#61',
-    name: 'Kathryn Murphy',
-    amount: 9100,
-    status: 'Approved',
-  },
-  {
-    id: '#52',
-    name: 'Arlene McCoy',
-    amount: 1750,
-    status: 'Pending',
-  },
-  {
-    id: '#32',
-    name: 'Theresa Webb',
-    amount: 5600,
-    status: 'Pending',
-  },
-  {
-    id: '#22',
-    name: 'Savannah Nguyen',
-    amount: 8300,
-    status: 'Approved',
-  },
-  {
-    id: '#22',
-    name: 'Savannah Nguyen',
-    amount: 4200,
-    status: 'Rejected',
-  },
-  {
-    id: '#27',
-    name: 'Brooklyn Simmons',
-    amount: 6750,
-    status: 'Approved',
-  },
-  {
-    id: '#27',
-    name: 'Brooklyn Simmons',
-    amount: 3900,
-    status: 'Rejected',
-  },
-  {
-    id: '#33',
-    name: 'Jane Cooper',
-    amount: 5200,
-    status: 'Approved',
-  },
-  {
-    id: '#44',
-    name: 'Wade Warren',
-    amount: 3800,
-    status: 'Pending',
-  },
-  {
-    id: '#55',
-    name: 'Esther Howard',
-    amount: 7200,
-    status: 'Rejected',
-  },
-  {
-    id: '#66',
-    name: 'Cameron Williamson',
-    amount: 4900,
-    status: 'Approved',
-  },
-  {
-    id: '#77',
-    name: 'Brooklyn Simmons',
-    amount: 6100,
-    status: 'Pending',
-  },
-  {
-    id: '#88',
-    name: 'Annette Black',
-    amount: 8900,
-    status: 'Approved',
-  },
-  {
-    id: '#99',
-    name: 'Ralph Edwards',
-    amount: 3300,
-    status: 'Rejected',
-  },
-  {
-    id: '#100',
-    name: 'Jerome Bell',
-    amount: 5800,
-    status: 'Pending',
-  },
-];
+import ConfirmationDelete from '@/features/modals/ConfirmationDelete';
+import { ILoanData, useLoans } from '@/lib/hooks/useLoans';
+import { SortField, StatusType } from '@/lib/types';
 
 const getStatusColor = (status: StatusType) => {
   switch (status) {
-    case 'Approved':
+    case 'APPROVED':
       return 'bg-green-100 text-green-800 hover:bg-green-100';
-    case 'Pending':
+    case 'PENDING':
       return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
-    case 'Rejected':
+    case 'REJECTED':
       return 'bg-red-100 text-red-800 hover:bg-red-100';
     default:
       return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
@@ -146,32 +25,32 @@ const getStatusColor = (status: StatusType) => {
 };
 
 export default function LoanTable() {
-  const [activeTab, setActiveTab] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const {
+    currentLoans,
+    currentPage,
+    itemsPerPage,
+    loanTypeDisplay,
+    totalItems,
+    totalPages,
+    startIndex,
+    endIndex,
+    sortDirection,
+    sortField,
+    handleItemsPerPageChange,
+    handleLoanTypeDisplayChange,
+    handlePageChange,
+    handlePreviousPage,
+    handleNextPage,
+    handleSort,
+  } = useLoans();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<IAffiliateData | null>(null);
-  const [deletingItem, setDeletingItem] = useState<IAffiliateData | null>(null);
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [editingItem, setEditingItem] = useState<ILoanData | null>(null);
+  const [deletingItem, setDeletingItem] = useState<ILoanData | null>(null);
 
-  const tabs = ['All', 'Approved', 'Rejected', 'Pending'];
+  const tabs = ['All', 'APPROVED', 'REJECTED', 'PENDING'];
   const itemsPerPageOptions = [5, 10, 15];
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      // If clicking the same field, toggle direction
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      // If clicking a different field, set new field and default to ascending
-      setSortField(field);
-      setSortDirection('asc');
-    }
-    // Reset to first page when sorting changes
-    setCurrentPage(1);
-  };
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
@@ -182,12 +61,12 @@ export default function LoanTable() {
     setIsAddModalOpen(true);
   };
 
-  const handleEdit = (item: IAffiliateData) => {
+  const handleEdit = (item: ILoanData) => {
     setEditingItem(item);
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = (item: IAffiliateData) => {
+  const handleDelete = (item: ILoanData) => {
     setDeletingItem(item);
     setIsDeleteModalOpen(true);
   };
@@ -213,54 +92,6 @@ export default function LoanTable() {
     setIsDeleteModalOpen(false);
     setDeletingItem(null);
   };
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    setCurrentPage(1); // Reset to first page when changing tabs
-  };
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number.parseInt(value));
-    setCurrentPage(1); // Reset to first page when changing items per page
-  };
-
-  const filteredData = mockData.filter((item) => {
-    if (activeTab === 'All') return true;
-    return item.status === activeTab;
-  });
-
-  // Sort the filtered data
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (!sortField) return 0;
-
-    let aValue: string | number;
-    let bValue: string | number;
-
-    if (sortField === 'name') {
-      aValue = a.name.toLowerCase();
-      bValue = b.name.toLowerCase();
-    } else if (sortField === 'amount') {
-      aValue = a.amount;
-      bValue = b.amount;
-    } else {
-      return 0;
-    }
-
-    if (aValue < bValue) {
-      return sortDirection === 'asc' ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return sortDirection === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
-
-  // Calculate pagination
-  const totalItems = sortedData.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = sortedData.slice(startIndex, endIndex);
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -303,22 +134,6 @@ export default function LoanTable() {
     return pages;
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
   return (
     <div className="w-full space-y-2 p-6">
       {/* Header */}
@@ -336,10 +151,10 @@ export default function LoanTable() {
           {tabs.map((tab) => (
             <Button
               key={tab}
-              variant={activeTab === tab ? 'default' : 'ghost'}
+              variant={loanTypeDisplay === tab ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => handleTabChange(tab)}
-              className={activeTab === tab ? 'bg-blue-50 text-blue-600 hover:bg-blue-50' : 'text-gray-600 hover:text-gray-900'}
+              onClick={() => handleLoanTypeDisplayChange(tab)}
+              className={loanTypeDisplay === tab ? 'bg-blue-50 text-blue-600 hover:bg-blue-50' : 'text-gray-600 hover:text-gray-900'}
             >
               {tab}
             </Button>
@@ -370,7 +185,7 @@ export default function LoanTable() {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead>ID</TableHead>
+              {/* <TableHead>ID</TableHead> */}
               <TableHead>
                 <button onClick={() => handleSort('name')} className="flex items-center hover:text-gray-900 font-medium">
                   Name
@@ -388,11 +203,11 @@ export default function LoanTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentData.map((item, index) => (
+            {currentLoans.map((item, index) => (
               <TableRow key={`${item.id}-${index}`} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{item.id}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell className="font-medium">${item.amount.toLocaleString()}</TableCell>
+                {/* <TableCell className="font-medium">{item.id}</TableCell> */}
+                <TableCell>{item.applicantname}</TableCell>
+                <TableCell className="font-medium">${item.requestedamount.toLocaleString()}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(item.status)}>{item.status}</Badge>
                 </TableCell>
@@ -448,8 +263,8 @@ export default function LoanTable() {
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}
           initialData={{
-            name: editingItem.name,
-            amount: editingItem.amount.toString(),
+            name: editingItem.applicantname,
+            amount: editingItem.requestedamount.toString(),
             status: editingItem.status,
           }}
         />
@@ -461,7 +276,7 @@ export default function LoanTable() {
           isOpen={isDeleteModalOpen}
           onClose={handleCloseDeleteModal}
           onConfirm={handleConfirmDelete}
-          itemName={deletingItem.name}
+          itemName={deletingItem.applicantname}
         />
       )}
     </div>

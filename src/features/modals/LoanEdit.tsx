@@ -89,9 +89,9 @@ const LoanEdit = ({ isOpen, onClose, initialData }: ILoanEdit) => {
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Approved">Approved</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Rejected">Rejected</SelectItem>
+                <SelectItem value="APPROVED">APPROVED</SelectItem>
+                <SelectItem value="PENDING">PENDING</SelectItem>
+                <SelectItem value="REJECTED">REJECTED</SelectItem>
               </SelectContent>
             </Select>
           </div>
