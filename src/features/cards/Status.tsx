@@ -8,12 +8,12 @@ interface StatusCardProps {
 }
 
 const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'approved':
+  switch (status) {
+    case 'APPROVED':
       return 'bg-green-100 text-green-800 hover:bg-green-100';
-    case 'pending':
+    case 'PENDING':
       return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
-    case 'rejected':
+    case 'REJECTED':
       return 'bg-red-100 text-red-800 hover:bg-red-100';
     default:
       return 'bg-gray-100 text-gray-800 hover:bg-gray-100';

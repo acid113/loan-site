@@ -1,129 +1,11 @@
 // TODO: refactor
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { SortDirection, SortField, StatusType } from '../types';
+import { SortDirection, SortField } from '@/lib/types';
+import { ILoanData } from '@/lib/interfaces';
+import { MOCK_DATA } from '../mocks';
 
-export interface ILoanData {
-  id: string;
-  applicantname: string;
-  requestedamount: number;
-  status: StatusType;
-  // createdat: Date;
-  // updatedat: Date;
-}
-
-const mockData: ILoanData[] = [
-  {
-    id: '#32',
-    applicantname: 'Darlene Robertson',
-    requestedamount: 2450,
-    status: 'APPROVED',
-  },
-  {
-    id: '#42',
-    applicantname: 'Ronald Richards',
-    requestedamount: 7890,
-    status: 'APPROVED',
-  },
-  {
-    id: '#21',
-    applicantname: 'Devon Lane',
-    requestedamount: 3200,
-    status: 'PENDING',
-  },
-  {
-    id: '#61',
-    applicantname: 'Kathryn Murphy',
-    requestedamount: 9100,
-    status: 'APPROVED',
-  },
-  {
-    id: '#52',
-    applicantname: 'Arlene McCoy',
-    requestedamount: 1750,
-    status: 'PENDING',
-  },
-  {
-    id: '#32',
-    applicantname: 'Theresa Webb',
-    requestedamount: 5600,
-    status: 'PENDING',
-  },
-  {
-    id: '#22',
-    applicantname: 'Savannah Nguyen',
-    requestedamount: 8300,
-    status: 'APPROVED',
-  },
-  {
-    id: '#22',
-    applicantname: 'Savannah Nguyen',
-    requestedamount: 4200,
-    status: 'REJECTED',
-  },
-  {
-    id: '#27',
-    applicantname: 'Brooklyn Simmons',
-    requestedamount: 6750,
-    status: 'APPROVED',
-  },
-  {
-    id: '#27',
-    applicantname: 'Brooklyn Simmons',
-    requestedamount: 3900,
-    status: 'REJECTED',
-  },
-  {
-    id: '#33',
-    applicantname: 'Jane Cooper',
-    requestedamount: 5200,
-    status: 'APPROVED',
-  },
-  {
-    id: '#44',
-    applicantname: 'Wade Warren',
-    requestedamount: 3800,
-    status: 'PENDING',
-  },
-  {
-    id: '#55',
-    applicantname: 'Esther Howard',
-    requestedamount: 7200,
-    status: 'REJECTED',
-  },
-  {
-    id: '#66',
-    applicantname: 'Cameron Williamson',
-    requestedamount: 4900,
-    status: 'APPROVED',
-  },
-  {
-    id: '#77',
-    applicantname: 'Brooklyn Simmons',
-    requestedamount: 6100,
-    status: 'PENDING',
-  },
-  {
-    id: '#88',
-    applicantname: 'Annette Black',
-    requestedamount: 8900,
-    status: 'APPROVED',
-  },
-  {
-    id: '#99',
-    applicantname: 'Ralph Edwards',
-    requestedamount: 3300,
-    status: 'REJECTED',
-  },
-  {
-    id: '#100',
-    applicantname: 'Jerome Bell',
-    requestedamount: 5800,
-    status: 'PENDING',
-  },
-];
-
-const BASE_URL = 'http://localhost:3000/api';
+const BASE = import.meta.env.VITE_BASE_URL;
 
 export const useLoans = () => {
   const [loans, setLoans] = useState<ILoanData[]>();
@@ -178,11 +60,11 @@ export const useLoans = () => {
   };
 
   useEffect(() => {
-    // setLoans(mockData);
+    // setLoans(MOCK_DATA); // * for testing purposes
 
     const fetchLoans = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/loans`);
+        const response = await axios.get(`${BASE}/loans`);
         const responseData = await response.data;
         setLoans(responseData.data);
       } catch (error) {
@@ -245,6 +127,7 @@ export const useLoans = () => {
   }, [currentPage, itemsPerPage, loans, loanTypeDisplay, sortDirection, sortField]);
 
   return {
+    allLoans: loans,
     currentLoans,
     currentPage,
     itemsPerPage,
