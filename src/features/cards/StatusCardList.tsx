@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useLoans } from '@/lib/hooks/useLoans';
 import StatusCard from '@/features/cards/Status';
+import { ILoanData } from '@/lib/interfaces';
 
-const StatusCardList = () => {
-  const { allLoans } = useLoans();
+interface StatusCardListProps {
+  loans?: ILoanData[];
+}
+
+const StatusCardList = ({ loans }: StatusCardListProps) => {
   const [approvedCount, setApprovedCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [rejectedCount, setRejectedCount] = useState(0);
@@ -12,9 +15,9 @@ const StatusCardList = () => {
   const [rejectedAmount, setRejectedAmount] = useState('0');
 
   useEffect(() => {
-    const approvedLoans = allLoans?.filter((loan) => loan.status === 'APPROVED');
-    const pendingLoans = allLoans?.filter((loan) => loan.status === 'PENDING');
-    const rejectedLoans = allLoans?.filter((loan) => loan.status === 'REJECTED');
+    const approvedLoans = loans?.filter((loan) => loan.status === 'APPROVED');
+    const pendingLoans = loans?.filter((loan) => loan.status === 'PENDING');
+    const rejectedLoans = loans?.filter((loan) => loan.status === 'REJECTED');
 
     setApprovedCount(approvedLoans ? approvedLoans.length : 0);
     setPendingCount(pendingLoans ? pendingLoans.length : 0);
@@ -23,9 +26,9 @@ const StatusCardList = () => {
     setApprovedAmount(approvedLoans ? approvedLoans.reduce((sum, loan) => sum + Number(loan.requestedamount), 0).toFixed(2) : '0');
     setPendingAmount(pendingLoans ? pendingLoans.reduce((sum, loan) => sum + Number(loan.requestedamount), 0).toFixed(2) : '0');
     setRejectedAmount(rejectedLoans ? rejectedLoans.reduce((sum, loan) => sum + Number(loan.requestedamount), 0).toFixed(2) : '0');
-  }, [allLoans]);
+  }, [loans]);
 
-  if (!allLoans) return null;
+  if (!loans) return null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
