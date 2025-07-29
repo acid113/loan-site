@@ -5,6 +5,11 @@ export interface ILoanData {
   applicantname: string;
   requestedamount: number;
   status: StatusType;
-  // createdat: Date;
-  // updatedat: Date;
+}
+
+export interface ILoanDataUpdate {
+  id: string;
+  applicantname?: string;
+  requestedamount?: number;
+  status?: StatusType;
 }

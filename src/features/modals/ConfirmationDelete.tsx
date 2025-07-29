@@ -6,10 +6,10 @@ interface ConfirmationDeleteProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  itemName: string;
+  applicantName: string;
 }
 
-const ConfirmationDelete = ({ isOpen, onClose, onConfirm, itemName }: ConfirmationDeleteProps) => {
+const ConfirmationDelete = ({ isOpen, onClose, onConfirm, applicantName }: ConfirmationDeleteProps) => {
   const handleConfirm = () => {
     onConfirm();
     onClose();
@@ -27,7 +27,7 @@ const ConfirmationDelete = ({ isOpen, onClose, onConfirm, itemName }: Confirmati
 
         <div className="mt-4">
           <p className="text-gray-600 mb-6">
-            Are you sure you want to delete the loan for <span className="font-semibold">{itemName}</span>? This action cannot be undone.
+            Are you sure you want to delete the loan for <span className="font-semibold">{applicantName}</span>? This action cannot be undone.
           </p>
 
           <div className="flex justify-end space-x-3">

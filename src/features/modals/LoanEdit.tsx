@@ -4,19 +4,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ILoanDataUpdate } from '@/lib/interfaces';
+import { StatusType } from '@/lib/types';
 
-interface ILoanEdit {
+interface LoanEditProps {
   isOpen: boolean;
-  onClose: () => void;
   initialData: {
+    id: string;
     name: string;
-    amount: string;
-    status: string;
+    amount: number;
+    status: StatusType;
   };
+  onClose: () => void;
+  onSubmit?: (data: ILoanDataUpdate) => void;
 }
 
-const LoanEdit = ({ isOpen, onClose, initialData }: ILoanEdit) => {
+const LoanEdit = ({ initialData, isOpen, onClose, onSubmit }: LoanEditProps) => {
   const [formData, setFormData] = useState({
+    id: initialData?.id || '',
     name: initialData?.name || '',
     amount: initialData?.amount || '',
     status: initialData?.status || '',
@@ -26,14 +31,19 @@ const LoanEdit = ({ isOpen, onClose, initialData }: ILoanEdit) => {
     e.preventDefault();
 
     // Validate required fields
-    if (!formData.name.trim() || !formData.amount.trim() || !formData.status) {
+    if (!formData.name.trim() || !formData.amount || !formData.status) {
       return;
     }
 
     // Handle form submission logic here
-    console.log('Edit form submitted:', formData);
-
-    // Close modal
+    if (onSubmit) {
+      onSubmit({
+        id: formData.id,
+        applicantname: formData.name,
+        requestedamount: Number(formData.amount),
+        status: formData.status,
+      });
+    }
     onClose();
   };
 

@@ -9,7 +9,7 @@ import { Plus, Edit, Trash2, ChevronLeft, ChevronRight, ChevronUp, ChevronDown }
 import LoanAdd from '@/features/modals/LoanAdd';
 import LoanEdit from '@/features/modals/LoanEdit';
 import ConfirmationDelete from '@/features/modals/ConfirmationDelete';
-import { ILoanData } from '@/lib/interfaces';
+import { ILoanData, ILoanDataUpdate } from '@/lib/interfaces';
 import { SortDirection, SortField, StatusType } from '@/lib/types';
 
 const getStatusColor = (status: StatusType) => {
@@ -27,9 +27,12 @@ const getStatusColor = (status: StatusType) => {
 
 interface LoanTableProps {
   loans?: ILoanData[];
+  onLoanAdded?: (name: string, requestedAmount: number) => void;
+  onLoanUpdated?: (data: ILoanDataUpdate) => void;
+  onLoanDeleted?: (id: string) => void;
 }
 
-export default function LoanTable({ loans }: LoanTableProps) {
+export default function LoanTable({ loans, onLoanAdded, onLoanDeleted, onLoanUpdated }: LoanTableProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -55,8 +58,15 @@ export default function LoanTable({ loans }: LoanTableProps) {
     return sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
 
-  const handleAddNew = () => {
+  const handleOpenAddLoanModal = () => {
     setIsAddModalOpen(true);
+  };
+
+  const handleLoanAdd = (name: string, amount: number) => {
+    if (onLoanAdded) {
+      onLoanAdded(name, amount);
+    }
+    setIsAddModalOpen(false);
   };
 
   const handleEdit = (item: ILoanData) => {
@@ -64,17 +74,25 @@ export default function LoanTable({ loans }: LoanTableProps) {
     setIsEditModalOpen(true);
   };
 
+  const handleLoanUpdate = (data: ILoanDataUpdate) => {
+    if (onLoanUpdated) {
+      onLoanUpdated(data);
+    }
+    setIsEditModalOpen(false);
+    setEditingItem(null);
+  };
+
   const handleDelete = (item: ILoanData) => {
     setDeletingItem(item);
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (deletingItem) {
-      // Handle delete logic here
-      console.log('Deleting item:', deletingItem);
-      setDeletingItem(null);
+  const handleLoanDelete = () => {
+    if (onLoanDeleted && deletingItem) {
+      onLoanDeleted(deletingItem.id);
     }
+    setDeletingItem(null);
+    setIsDeleteModalOpen(false);
   };
 
   const handleCloseAddModal = () => {
@@ -227,7 +245,7 @@ export default function LoanTable({ loans }: LoanTableProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Loans</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddNew}>
+        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleOpenAddLoanModal}>
           <Plus className="mr-2 h-4 w-4" />
           Add New Loan
         </Button>
@@ -343,7 +361,7 @@ export default function LoanTable({ loans }: LoanTableProps) {
       </div>
 
       {/* Add Loan Modal */}
-      <LoanAdd isOpen={isAddModalOpen} onClose={handleCloseAddModal} mode="add" />
+      <LoanAdd isOpen={isAddModalOpen} onClose={handleCloseAddModal} onSubmit={handleLoanAdd} />
 
       {/* Edit Loan Modal */}
       {editingItem && (
@@ -351,10 +369,12 @@ export default function LoanTable({ loans }: LoanTableProps) {
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}
           initialData={{
+            id: editingItem.id,
             name: editingItem.applicantname,
-            amount: editingItem.requestedamount.toString(),
+            amount: editingItem.requestedamount,
             status: editingItem.status,
           }}
+          onSubmit={handleLoanUpdate}
         />
       )}
 
@@ -363,8 +383,8 @@ export default function LoanTable({ loans }: LoanTableProps) {
         <ConfirmationDelete
           isOpen={isDeleteModalOpen}
           onClose={handleCloseDeleteModal}
-          onConfirm={handleConfirmDelete}
-          itemName={deletingItem.applicantname}
+          onConfirm={handleLoanDelete}
+          applicantName={deletingItem.applicantname}
         />
       )}
     </div>

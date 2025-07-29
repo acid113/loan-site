@@ -7,32 +7,27 @@ import { Label } from '@/components/ui/label';
 interface LoanAddProps {
   isOpen: boolean;
   onClose: () => void;
-  mode: 'add' | 'edit';
-  initialData?: {
-    name: string;
-    amount: string;
-  };
+  onSubmit?: (name: string, amount: number) => void;
 }
 
-const LoanAdd = ({ isOpen, onClose, mode, initialData }: LoanAddProps) => {
+const LoanAdd = ({ isOpen, onClose, onSubmit }: LoanAddProps) => {
   const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    amount: initialData?.amount || '',
+    name: '',
+    amount: 0,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate required fields
-    if (!formData.name.trim() || !formData.amount.trim()) {
+    if (!formData.name.trim() || !formData.amount) {
       return;
     }
 
-    // Handle form submission logic here
-    console.log('Form submitted:', formData);
-
     // Reset form and close modal
-    setFormData({ name: '', amount: '' });
+    if (onSubmit) {
+      onSubmit(formData.name, formData.amount);
+    }
     onClose();
   };
 
@@ -47,7 +42,7 @@ const LoanAdd = ({ isOpen, onClose, mode, initialData }: LoanAddProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-900">{mode === 'add' ? 'Add New Loan' : 'Edit Loan'}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-900">{'Add New Loan'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
@@ -84,7 +79,7 @@ const LoanAdd = ({ isOpen, onClose, mode, initialData }: LoanAddProps) => {
               Cancel
             </Button>
             <Button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white">
-              {mode === 'add' ? 'Submit' : 'Update'}
+              {'Submit'}
             </Button>
           </div>
         </form>
