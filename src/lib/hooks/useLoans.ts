@@ -9,6 +9,8 @@ const BASE = import.meta.env.VITE_BASE_URL;
 
 export const useLoans = (useMock: boolean = false) => {
   const [loans, setLoans] = useState<ILoanData[]>();
+  const token = localStorage.getItem('authToken');
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
   const fetchLoans = async () => {
     if (useMock) {
