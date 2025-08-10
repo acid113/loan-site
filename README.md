@@ -1,8 +1,8 @@
 # Loan Site
 
-This is a simple site connecting the Loan Service. 
+This is a simple React site using the Loan Service as backend.
 
-Tech stack: React (TypeScript) created using Vite, Shadcn for UI components 
+Tech stack: React (TypeScript) created with Vite, Shadcn for UI components, React Router for basic routing
 
 ## Project Structure
 
